@@ -1,8 +1,0 @@
-fastapi
-uvicorn[standard]
-python-dotenv
-openai
-jinja2
-python-multipart
-python-docx
-httpx
