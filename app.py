@@ -10,6 +10,7 @@ from docx import Document
 import glob
 
 load_dotenv()
+os.environ["DASHSCOPE_API_KEY"] = "sk-66c90f79d2814119a50639180d2d3b08"  # 临时硬编码
 
 # ==================== 终极调试：打印所有环境变量 + 检查 TEST_VAR ====================
 print("="*60)
