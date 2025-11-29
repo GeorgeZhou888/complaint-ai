@@ -10,29 +10,50 @@ from docx import Document
 import glob
 
 load_dotenv()
-# ==================== Railway 专用调试 + 强制检查密钥 ====================
-import os
-import sys
 
-print("=== [Railway 调试] 正在启动应用，检查环境变量 ===")
-key = os.getenv("DASHSCOPE_API_KEY")
+# ==================== 终极调试：打印所有环境变量 + 检查 TEST_VAR ====================
+print("="*60)
+print(">>> [DEBUG 终极版] 正在启动应用... 打印所有环境变量...")
 
-if not key:
-    print("错误：DASHSCOPE_API_KEY 环境变量未设置或为空！应用无法启动！")
-    print("请在 Railway Variables 中正确添加 DASHSCOPE_API_KEY")
-    sys.exit(1)  # 直接退出，防止继续运行
+try:
+    all_vars = dict(os.environ)
+    print(">>> [DEBUG] --- 所有环境变量开始 ---")
+    for k, v in sorted(all_vars.items()):
+        # 为了安全，密钥类只显示长度和前后几位
+        if 'KEY' in k.upper() or 'TOKEN' in k.upper() or 'PASS' in k.upper():
+            if v:
+                print(f"{k}: [长度 {len(v)}] {v[:6]}...{v[-4:]}")
+            else:
+                print(f"{k}: None")
+        else:
+            print(f"{k}: {v}")
+    print(">>> [DEBUG] --- 所有环境变量结束 ---")
+except Exception as e:
+    print(f">>> [DEBUG] 打印环境变量出错: {e}")
 
-print(f"成功读取到 DASHSCOPE_API_KEY！长度: {len(key)} 字符")
-print("OpenAI 客户端初始化中...")
+# 检查测试变量
+test_var = os.getenv("TEST_VAR")
+print(f">>> [DEBUG] TEST_VAR 的值: {test_var}")
 
-# 正式初始化客户端（不再使用本地代理！Railway 不需要）
-client = OpenAI(
-    api_key=key,
-    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-)
+# 检查你的真实 key
+dash_key = os.getenv("DASHSCOPE_API_KEY")
+if not dash_key:
+    print(">>> [DEBUG] 错误：DASHSCOPE_API_KEY 未找到！(值为 None)")
+    print(">>> [DEBUG] 已跳过 sys.exit() 以继续查看日志")
+else:
+    print(f">>> [DEBUG] 成功！DASHSCOPE_API_KEY 已找到 (长度: {len(dash_key)})")
 
-print("OpenAI 客户端初始化成功！")
-print("====================================================")
+# 尝试初始化客户端（无论如何都执行）
+try:
+    client = OpenAI(
+        api_key=dash_key,
+        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+    )
+    print(">>> [DEBUG] OpenAI 客户端初始化成功！")
+except Exception as e:
+    print(f">>> [DEBUG] OpenAI 客户端初始化失败: {e}")
+
+print("="*60)
 # =====================================================================
 
 app = FastAPI()
